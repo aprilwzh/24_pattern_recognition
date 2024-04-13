@@ -1,71 +1,86 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import utils
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import SVM
+from MLP import MLP, train, evaluate_model
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, Dataset, TensorDataset
+import torchvision.transforms as transforms
+import multiprocessing
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     folder_name = 'MNIST-full/'
     file_name = 'gt-test.tsv'
 
+    # Load test data
     start = time.time()
     test_file_names, test_labels = utils.read_file(folder_name, file_name, train=False)
-    end = time.time()
-
-    print(f'time elapsed: {round(end - start, 2)}')
-    print(test_file_names[:10])
-    print(test_labels[:10, 0])
-
-    start = time.time()
     test_samples = utils.load_files(folder_name, test_file_names)
     end = time.time()
 
     print(f'time elapsed: {round(end - start, 2)}')
 
-    # idxs = np.flatnonzero(np.equal(labels, cls))
-    idxs = np.random.choice(range(0, len(test_file_names)), 10, replace=False)
-    for i, idx in enumerate(idxs):
-        # plt_idx = y * samples_per_class + i + 1
-        plt.subplot(1, 10, i+1)
-        plt.imshow(test_samples[idx])
-        plt.axis('off')
-        # plt.title(cls)
-    plt.show()
-
+    # Load train data
     file_name = 'gt-train.tsv'
-
     start = time.time()
     train_file_names, train_labels = utils.read_file(folder_name, file_name, train=True)
-    end = time.time()
-
-    print(f'time elapsed: {round(end - start, 2)}')
-    print(train_file_names[:10])
-    print(train_labels[:10, 0])
-
-    start = time.time()
     train_samples = utils.load_files(folder_name, train_file_names)
     end = time.time()
 
     print(f'time elapsed: {round(end - start, 2)}')
 
-    # idxs = np.flatnonzero(np.equal(labels, cls))
-    idxs = np.random.choice(range(0, len(train_file_names)), 10, replace=False)
-    for i, idx in enumerate(idxs):
-        # plt_idx = y * samples_per_class + i + 1
-        plt.subplot(1, 10, i + 1)
-        plt.imshow(train_samples[idx])
-        plt.axis('off')
-        # plt.title(cls)
+    # Define your hyperparameters
+    input_size = 28 * 28  # Input size assuming MNIST images
+    hidden_size = 128
+    output_size = 10  # Output size for 10 classes in MNIST
+    learning_rate = 0.001
+    num_epochs = 10
+
+    # Convertir numpy arrays en tensors
+    train_data_tensor = torch.from_numpy(train_samples).float()
+    train_labels_tensor = torch.from_numpy(train_labels.reshape(-1)).long()  # Redimensionner et convertir en tensor
+    test_data_tensor = torch.from_numpy(test_samples).float()
+    test_labels_tensor = torch.from_numpy(test_labels.reshape(-1)).long()  # Redimensionner et convertir en tensor
+    
+    # Créer les datasets
+    train_dataset = TensorDataset(train_data_tensor, train_labels_tensor)
+    test_dataset = TensorDataset(test_data_tensor, test_labels_tensor)
+
+
+    # Redimensionner les données à une taille fixe (par exemple, 28x28)
+    transform = transforms.Compose([
+        transforms.Resize((28, 28)),
+        transforms.ToTensor()
+    ])
+
+    # Créer les datasets
+    train_dataset = TensorDataset(train_data_tensor, train_labels_tensor)
+    test_dataset = TensorDataset(test_data_tensor, test_labels_tensor)
+
+    # Créer les data loaders avec num_workers pour utiliser plusieurs cœurs pour le chargement des données
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=multiprocessing.cpu_count())
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=multiprocessing.cpu_count())
+
+    # Initialize your MLP model
+    model = MLP(input_size, hidden_size, output_size)
+
+    # Define your loss function and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    # Train your model
+    train_losses, valid_losses = train(model, criterion, optimizer, train_loader, train_loader, num_epochs)
+
+    # Plot loss curves
+    plt.plot(train_losses, label='Train Loss')
+    plt.plot(valid_losses, label='Valid Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
     plt.show()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # Evaluate the model on test set
+    test_accuracy = evaluate_model(model, test_loader)
+    print(f'Test Accuracy: {test_accuracy:.4f}')

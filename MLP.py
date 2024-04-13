@@ -1,53 +1,64 @@
-import numpy as np
-import pandas as pd
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import GridSearchCV, GroupKFold
-from sklearn.metrics import accuracy_score
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, Dataset
+import torchvision.transforms as transforms
 
-# Load the training and test datasets
-train_data = pd.read_csv('MNIST-full\\MNIST-full\\gt-train.tsv', sep='\t', header=None)
-test_data = pd.read_csv('MNIST-full\\MNIST-full\\gt-test.tsv', sep='\t', header=None)
+class MLP(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, output_size)
 
-# Extract features and labels
-X_train = train_data.drop(columns=[0]).values
-y_train = train_data[0].values
+    def forward(self, x):
+        x = x.view(x.size(0), -1)  # Flatten the input tensor
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
 
-X_test = test_data.drop(columns=[0]).values
-y_test = test_data[0].values
+def train(model, criterion, optimizer, train_loader, valid_loader, num_epochs):
+    train_losses = []
+    valid_losses = []
+    for epoch in range(num_epochs):
+        model.train()
+        train_loss = 0.0
+        for inputs, labels in train_loader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            train_loss += loss.item() * inputs.size(0)
+        train_loss /= len(train_loader.dataset)
+        train_losses.append(train_loss)
 
-# Create a group column with two groups
-train_data['group'] = np.repeat([0, 1], len(train_data) // 2)
+        model.eval()
+        valid_loss = 0.0
+        for inputs, labels in valid_loader:
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            valid_loss += loss.item() * inputs.size(0)
+        valid_loss /= len(valid_loader.dataset)
+        valid_losses.append(valid_loss)
 
-# Define the MLP classifier
-mlp = MLPClassifier(max_iter=10000)  # Increase the maximum number of iterations
+        print(f'Epoch [{epoch+1}/{num_epochs}], Train Loss: {train_loss:.4f}, Valid Loss: {valid_loss:.4f}')
 
-# Define the hyperparameter grid
-param_grid = {
-    'hidden_layer_sizes': np.arange(10, 257, 10),
-    'learning_rate_init': np.logspace(-4, -1, 4)
-}
+    return train_losses, valid_losses
 
-# Perform grid search with group cross-validation with 2 groups
-group_cv = GroupKFold(n_splits=2)
-grid_search = GridSearchCV(mlp, param_grid, cv=group_cv, n_jobs=-1)
-grid_search.fit(X_train, y_train, groups=train_data['group'])
+def evaluate_model(model, test_loader):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    accuracy = correct / total
+    return accuracy
 
-# Get the best parameters and best accuracy
-best_params = grid_search.best_params_
-best_accuracy = grid_search.best_score_
 
-# Train the MLP classifier with the best parameters
-best_mlp = MLPClassifier(hidden_layer_sizes=best_params['hidden_layer_sizes'],
-                         learning_rate_init=best_params['learning_rate_init'],
-                         max_iter=10000)  # Increase max_iter for better convergence
-best_mlp.fit(X_train, y_train)
-
-# Predict on the test set
-y_pred = best_mlp.predict(X_test)
-
-# Calculate accuracy on the test set
-accuracy = accuracy_score(y_test, y_pred)
-
-print("Best parameters:", best_params)
-print("Best accuracy:", best_accuracy)
-print("Accuracy on test set:", accuracy)
+## Test Accuracy: 0.9605
