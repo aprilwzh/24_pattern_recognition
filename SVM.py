@@ -20,9 +20,10 @@ def plot_classifiers_predictions(x, y, classifiers):
     for classifier, axis in zip(classifiers, axes.flat):
         # Fit the classifier to the data
         classifier.fit(x, y)
-
+        print(classifier.n_features_in_)
         # Plot the decision regions
-        plot_decision_regions(x, y, clf=classifier, legend=2, ax=axis)
+        plot_decision_regions(x, y, clf=classifier, legend=2, ax=axis,
+                              filler_feature_values=range(classifier.n_features_in_))
 
         # Plot the support vectors
         x_support = x[classifier.support_]
@@ -34,10 +35,10 @@ def plot_classifiers_predictions(x, y, classifiers):
     plt.show()
 
 
-linear_svc = SVC(kernel="linear")
-rbf_svc = SVC(kernel="rbf")
-
-classifiers = [linear_svc, rbf_svc]
-
-X_blobs, y_blobs = make_blobs(n_samples=300, centers=[[-1.5, -1.5], [1.5, 1.5]])
-plot_classifiers_predictions(X_blobs, y_blobs, classifiers)
+# linear_svc = SVC(kernel="linear")
+# rbf_svc = SVC(kernel="rbf")
+#
+# classifiers = [linear_svc, rbf_svc]
+#
+# X_blobs, y_blobs = make_blobs(n_samples=300, centers=[[-1.5, -1.5], [1.5, 1.5]])
+# plot_classifiers_predictions(X_blobs, y_blobs, classifiers)

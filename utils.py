@@ -11,7 +11,7 @@ def read_file(folder_name, file_name, train=True):
         n_files = 10000
 
     file_names = [None] * n_files
-    labels = np.zeros((n_files, 1), dtype='uint8') - 1
+    labels = np.zeros(n_files, dtype='uint8') - 1
     with open(folder_name + file_name) as file:
         tsv_file = csv.reader(file, delimiter='\t')
 

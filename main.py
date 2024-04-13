@@ -6,10 +6,8 @@ import utils
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+import SVM
+from sklearn.preprocessing import StandardScaler
 
 
 # Press the green button in the gutter to run the script.
@@ -22,8 +20,8 @@ if __name__ == '__main__':
     end = time.time()
 
     print(f'time elapsed: {round(end - start, 2)}')
-    print(test_file_names[:10])
-    print(test_labels[:10, 0])
+    # print(test_file_names[:10])
+    # print(test_labels[:10])
 
     start = time.time()
     test_samples = utils.load_files(folder_name, test_file_names)
@@ -48,11 +46,13 @@ if __name__ == '__main__':
     end = time.time()
 
     print(f'time elapsed: {round(end - start, 2)}')
-    print(train_file_names[:10])
-    print(train_labels[:10, 0])
+    # print(train_file_names[:10])
+    # print(train_labels[:10])
+    # print(train_file_names.shape)
 
     start = time.time()
     train_samples = utils.load_files(folder_name, train_file_names)
+    # print(train_samples.shape)
     end = time.time()
 
     print(f'time elapsed: {round(end - start, 2)}')
@@ -67,4 +67,27 @@ if __name__ == '__main__':
         # plt.title(cls)
     plt.show()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    linear_svc = SVM.SVC(kernel="linear")
+    rbf_svc = SVM.SVC(kernel="rbf")
+    #
+    classifiers = [linear_svc, rbf_svc]
+
+    # print()
+
+    flat_test_samples = np.reshape(test_samples, (len(test_samples), 784), order='C')
+    flat_train_samples = np.reshape(train_samples, (len(train_samples), 784), order='C')
+    sc = StandardScaler()
+    X_test = sc.fit_transform(flat_test_samples)
+    X_train = sc.fit_transform(flat_train_samples)
+    # print(X_test.shape)
+    # print(test_labels.shape)
+
+    start = time.time()
+    # X_blobs, y_blobs = SVM.make_blobs(n_samples=300, centers=[[-1.5, -1.5], [1.5, 1.5]])
+    # SVM.plot_classifiers_predictions(X_test, test_labels, classifiers)
+    linear_svc.fit(X_train, train_labels)
+    print('score:', linear_svc.score(X_test, test_labels))
+    end = time.time()
+    # linear_svc.fit()
+
+    print(f'time elapsed: {round(end - start, 2)}s')
