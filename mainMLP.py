@@ -31,8 +31,8 @@ if __name__ == '__main__':
 
     print(f'time elapsed: {round(end - start, 2)}')
 
-    # Define your hyperparameters
-    input_size = 28 * 28  # Input size assuming MNIST images
+    # Define the hyperparameters
+    input_size = 28 * 28  # Input size assuming MNIST images (= 784)
     hidden_size = 128
     output_size = 10  # Output size for 10 classes in MNIST
     learning_rate = 0.001
@@ -47,8 +47,6 @@ if __name__ == '__main__':
     train_dataset = TensorDataset(train_data_tensor, train_labels_tensor)
     test_dataset = TensorDataset(test_data_tensor, test_labels_tensor)
 
-
-
     transform = transforms.Compose([
         transforms.Resize((28, 28)),
         transforms.ToTensor()
@@ -62,14 +60,14 @@ if __name__ == '__main__':
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=multiprocessing.cpu_count())
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=multiprocessing.cpu_count())
 
-    # Initialize your MLP model
+    # Initialize the MLP model
     model = MLP(input_size, hidden_size, output_size)
 
-    # Define your loss function and optimizer
+    # Define the loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    # Train your model
+    # Train the model
     train_losses, valid_losses = train(model, criterion, optimizer, train_loader, train_loader, num_epochs)
 
     # Plot loss curves
