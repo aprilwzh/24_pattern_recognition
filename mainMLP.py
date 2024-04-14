@@ -44,22 +44,21 @@ if __name__ == '__main__':
     test_data_tensor = torch.from_numpy(test_samples).float()
     test_labels_tensor = torch.from_numpy(test_labels.reshape(-1)).long()  # Redimensionner et convertir en tensor
     
-    # Créer les datasets
     train_dataset = TensorDataset(train_data_tensor, train_labels_tensor)
     test_dataset = TensorDataset(test_data_tensor, test_labels_tensor)
 
 
-    # Redimensionner les données à une taille fixe (par exemple, 28x28)
+
     transform = transforms.Compose([
         transforms.Resize((28, 28)),
         transforms.ToTensor()
     ])
 
-    # Créer les datasets
+
     train_dataset = TensorDataset(train_data_tensor, train_labels_tensor)
     test_dataset = TensorDataset(test_data_tensor, test_labels_tensor)
 
-    # Créer les data loaders avec num_workers pour utiliser plusieurs cœurs pour le chargement des données
+    # Create DataLoader
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=multiprocessing.cpu_count())
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=multiprocessing.cpu_count())
 
