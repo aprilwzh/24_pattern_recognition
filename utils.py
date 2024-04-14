@@ -3,7 +3,7 @@ import numpy as np
 import imageio.v3 as iio
 
 
-def read_file(folder_name, file_name, train=True):
+def read_file(folder_name, file_name, train=True, has_labels=True):
     n_files = -1
     if train:
         n_files = 60000
@@ -17,7 +17,8 @@ def read_file(folder_name, file_name, train=True):
 
         for i, line in enumerate(tsv_file):
             file_names[i] = line[0]
-            labels[i] = line[1]
+            if has_labels:
+                labels[i] = line[1]
 
     return file_names, labels
 

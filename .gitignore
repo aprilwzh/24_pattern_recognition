@@ -1,5 +1,7 @@
 MNIST-full/
+Fashion-MNIST/
 Exercise-2-CNN-individual.pdf
 .idea/
 __pycache__/
 data/
+out/
