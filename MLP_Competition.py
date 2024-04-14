@@ -79,10 +79,15 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    # Evaluate the model on the test set
+    # Convert test samples to tensor
     test_data_tensor = torch.from_numpy(test_samples).float()
-    test_labels_tensor = torch.from_numpy(test_labels.reshape(-1)).long()
-    test_dataset = TensorDataset(test_data_tensor, test_labels_tensor)
+
+    # Create a Dataset from test data tensor
+    test_dataset = TensorDataset(test_data_tensor)
+
+    # Create a DataLoader from the test Dataset
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=multiprocessing.cpu_count())
+
+    # Evaluate the model on the test set
     test_accuracy = evaluate_model(model, test_loader)
     print(f'Test Accuracy: {test_accuracy:.4f}')
