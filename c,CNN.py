@@ -36,6 +36,20 @@ class CNN(nn.Module):
         x = self.fc(x)
         return x
 
+# Function to evaluate the CNN
+def evaluate_cnn(model, test_loader):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for images, labels in test_loader:
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    accuracy = correct / total
+    print(f"Accuracy on the test set: {accuracy}")
+    
 # Function to train the CNN
 def train_cnn(model, train_loader, val_loader, criterion, optimizer, num_epochs=5):
     train_loss_history = []
@@ -143,6 +157,9 @@ def main():
 
     # Train the model
     train_cnn(model, train_loader, val_loader, criterion, optimizer, num_epochs=num_epochs)
+    
+    # Evaluate the model
+    evaluate_cnn(model,  val_loader)
 
 if __name__ == "__main__":
     main()
