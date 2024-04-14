@@ -12,12 +12,12 @@ import multiprocessing
 from sklearn.model_selection import train_test_split
 
 if __name__ == '__main__':
-    folder_name = 'Fashion_MNIST/'
+    folder_name = 'Fashion-MNIST/'
     file_name = 'gt-test.tsv'
 
     # Load test data
     start = time.time()
-    test_file_names, test_labels = utils.read_file(folder_name, file_name, train=False)
+    test_file_names, _ = utils.read_file(folder_name, file_name, train=False, has_labels=False)  # Set has_labels to False
     test_samples = utils.load_files(folder_name, test_file_names)
     end = time.time()
 
