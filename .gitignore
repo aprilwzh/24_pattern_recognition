@@ -5,3 +5,5 @@ Exercise-2-CNN-individual.pdf
 __pycache__/
 data/
 out/
+april_*
+*MLP*
