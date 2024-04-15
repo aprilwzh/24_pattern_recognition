@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader, Dataset, TensorDataset
 import torchvision.transforms as transforms
 import multiprocessing
 from sklearn.model_selection import train_test_split
+import csv
 
 if __name__ == '__main__':
     folder_name = 'Fashion-MNIST/'
@@ -88,6 +89,20 @@ if __name__ == '__main__':
     # Create a DataLoader from the test Dataset
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=multiprocessing.cpu_count())
 
-    # Evaluate the model on the test set
-    test_accuracy = evaluate_model(model, test_loader)
-    print(f'Test Accuracy: {test_accuracy:.4f}')
+    # Get predictions for test data
+    model.eval()
+    y_test_pred = []
+    with torch.no_grad():
+        for inputs in test_loader:
+            inputs = torch.stack(inputs, dim=0)  # Concatenate tensors in the list along the batch dimension
+            outputs = model(inputs)  # Pass concatenated inputs to the model
+            _, predicted = torch.max(outputs, 1)
+            y_test_pred.extend(predicted.cpu().numpy())  # Move predictions back to CPU and convert to numpy array
+
+    # Write predictions to gt-test.tsv
+    with open('out/gt-test.tsv', 'w', newline='') as tsvfile:
+        writer = csv.writer(tsvfile, delimiter='\t', lineterminator='\n')
+        for name, label in zip(test_file_names, y_test_pred):
+            writer.writerow([name, label])
+
+    print("Predictions written to 'out/gt-test.tsv'")
