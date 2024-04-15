@@ -76,4 +76,40 @@ RBF & 1 & 0.9691 \\
 \caption{SVM Test Set accuracy}
 \end{table}
 
+\section{MLP}
+
+For the MLP, we used PyTorch. We tried first with other librairies but the process would take too much time. With \textit{torch}, the process takes about 30 minutes to find a result.
+The Epoch result is the following : 
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Epoch & Train Loss & Validation Loss\\
+        \hline
+        1/10 & 0.5429 & 0.1659 \\
+        2/10 & 0.1832 & 0.1409 \\
+        3/10 & 0.1572 & 0.1336 \\
+        4/10 & 0.1515 & 0.1420 \\
+        5/10 & 0.1424 & 0.1200 \\
+        6/10 & 0.1372 & 0.1302 \\
+        7/10 & 0.1334 & 0.1420 \\
+        8/10 & 0.1287 & 0.1192 \\
+        9/10 & 0.1246 & 0.1001 \\
+        10/10 & 0.1259 & 0.1032 \\
+        \hline
+    \end{tabular}
+    \caption{Evolution of Train and Validation Loss}
+    \label{tab:Loss}
+\end{table}
+
+For an accuracy of 96.05\%
+
+Here is the graph generated : 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/MLP_TrainLoss_ValidLoss.png}
+    \caption{Train and Valid Loss of the MLP}
+    \label{fig:TrainValidLoss_MLP}
+\end{figure}
+
 \end{document}
