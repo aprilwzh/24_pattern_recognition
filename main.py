@@ -6,7 +6,7 @@ import utils
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import SVM
+import OLD_SVM
 from sklearn.preprocessing import StandardScaler
 
 
@@ -67,8 +67,8 @@ if __name__ == '__main__':
         # plt.title(cls)
     plt.show()
 
-    linear_svc = SVM.SVC(kernel="linear")
-    rbf_svc = SVM.SVC(kernel="rbf")
+    linear_svc = OLD_SVM.SVC(kernel="linear")
+    rbf_svc = OLD_SVM.SVC(kernel="rbf")
     #
     classifiers = [linear_svc, rbf_svc]
 
