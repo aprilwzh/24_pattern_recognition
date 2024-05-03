@@ -1,1 +1,6 @@
 homework3.py
+.idea/
+data/
+Fashion-MNIST/
+gt-comp/
+MNIST-full/
