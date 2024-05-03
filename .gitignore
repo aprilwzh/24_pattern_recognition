@@ -4,3 +4,6 @@ data/
 Fashion-MNIST/
 gt-comp/
 MNIST-full/
+my_code/
+.DS_Store
+__pycache__/
