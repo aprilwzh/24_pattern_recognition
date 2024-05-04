@@ -1,0 +1,7 @@
+svg.path
+opencv-python
+numpy
+pillow
+matplotlib
+fastdtw
+tslearn
