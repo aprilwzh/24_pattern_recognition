@@ -249,7 +249,7 @@ def read_transcription(train_files, validation_files):
 
     return train_transcription, validation_transcription
 
-def transfrom_rank_into_word(ranked_dtw_distances, train_transcription):
+def transform_rank_into_word(ranked_dtw_distances, train_transcription):
     train_word_ranks = []
 
     for validation_word_index in ranked_dtw_distances:
@@ -327,7 +327,7 @@ ranked_dtw_distances = rank_dtw_distances(dtw_distances)
 
 # Compare the ranked words for the keywords and calculate the precision
 train_transcription, validation_transcription = read_transcription(train_files, validation_files)
-ranked_train_words = transfrom_rank_into_word(ranked_dtw_distances, train_transcription)
+ranked_train_words = transform_rank_into_word(ranked_dtw_distances, train_transcription)
 keywords = read_keywords()
 precision_top_ranks = np.arange(1, len(train_transcription))
 precision, recall = calculate_precision_and_recall(precision_top_ranks, keywords, ranked_train_words, validation_transcription)

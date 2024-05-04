@@ -7,7 +7,39 @@ from PIL import ImageOps, Image
 from tslearn.metrics import dtw
 import os
 
-from Exercise_4.main import transfrom_rank_into_word
+
+def get_path_box(path):
+    xmin = float('inf')
+    ymin = float('inf')
+    xmax = float('-inf')
+    ymax = float('-inf')
+    for segment in path:
+        if isinstance(segment, svg.path.Line):
+            x1, y1 = segment.start.real, segment.start.imag
+            x2, y2 = segment.end.real, segment.end.imag
+            xmin = min(xmin, x1, x2)
+            ymin = min(ymin, y1, y2)
+            xmax = max(xmax, x1, x2)
+            ymax = max(ymax, y1, y2)
+        elif isinstance(segment, svg.path.QuadraticBezier):
+            x1, y1 = segment.start.real, segment.start.imag
+            x2, y2 = segment.control.real, segment.control.imag
+            x3, y3 = segment.end.real, segment.end.imag
+            xmin = min(xmin, x1, x2, x3)
+            ymin = min(ymin, y1, y2, y3)
+            xmax = max(xmax, x1, x2, x3)
+            ymax = max(ymax, y1, y2, y3)
+        elif isinstance(segment, svg.path.CubicBezier):
+            x1, y1 = segment.start.real, segment.start.imag
+            x2, y2 = segment.control1.real, segment.control1.imag
+            x3, y3 = segment.control2.real, segment.control2.imag
+            x4, y4 = segment.end.real, segment.end.imag
+            xmin = min(xmin, x1, x2, x3, x4)
+            ymin = min(ymin, y1, y2, y3, y4)
+            xmax = max(xmax, x1, x2, x3, x4)
+            ymax = max(ymax, y1, y2, y3, y4)
+    return xmin, ymin, xmax, ymax
+
 
 def read_keywords():
     keywords_file = "Exercise_4/KWS-test/keywords.tsv"
@@ -44,6 +76,7 @@ def get_images_from_words(filenumber, words):
         word_polygons.append(path)
         word_images.append(word_arr)
     return word_polygons, word_images
+
 
 def get_binarized_images(word_images):
     binarized_word_images = []
@@ -125,6 +158,18 @@ def feature_matrices(binarized_word_images):
         feature_matrices.append(sliding_window(pic, 1, 1))
     return feature_matrices
 
+def transform_rank_into_word(ranked_dtw_distances, train_transcription):
+    train_word_ranks = []
+
+    for validation_word_index in ranked_dtw_distances:
+        rank_per_word = []
+        for ranked_train_word_index in validation_word_index:
+            rank_per_word.append(train_transcription[ranked_train_word_index])
+
+        train_word_ranks.append(rank_per_word)
+
+    return train_word_ranks
+
 def find_dtw(validation_set, train_set):
     dtw_matrix = np.zeros(shape = (len(validation_set), len(train_set)))
     for i in range(0 , len(validation_set)):
@@ -201,7 +246,7 @@ def main():
     dtw_distances = find_dtw(validation_set, train_set)
     ranked_dtw_distances = rank_dtw_distances(dtw_distances)
 
-    ranked_train_words = transfrom_rank_into_word(ranked_dtw_distances, train_transcription)
+    ranked_train_words = transform_rank_into_word(ranked_dtw_distances, train_transcription)
     validation_transcription = [item for sublist in [read_jpg_file(i)[1] for i in test_set] for item in sublist]
 
     precision_top_ranks = np.arange(1, len(train_transcription))
