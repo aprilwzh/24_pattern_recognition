@@ -43,8 +43,9 @@ def get_path_box(path: svg.path):
             ymax = max(ymax, y1, y2, y3, y4)
     return xmin, ymin, xmax, ymax
 
+# Exercise_4\Exercise_4\ground-truth\locations\270.svg
 def read_svg_file(filenumber):
-    with open('ground-truth/locations/' + str(filenumber) + '.svg', 'r') as f:
+    with open('Exercise_4/Exercise_4/ground-truth/locations/' + str(filenumber) + '.svg', 'r') as f:
         svg_data = f.read()
     root = ET.fromstring(svg_data)
     # Extract the path commands for each word
@@ -58,7 +59,7 @@ def read_svg_file(filenumber):
     return words, ids
 
 def get_images_from_words(filenumber, words):
-    img = Image.open('images/' + str(filenumber) + '.jpg')
+    img = Image.open('Exercise_4/Exercise_4/images/' + str(filenumber) + '.jpg')
     # Extract the word polygons and images
     word_polygons = []
     word_images = []
@@ -230,7 +231,7 @@ def rank_dtw_distances(dtw_distances):
     return ranked_dtw_distances
 
 def read_transcription(train_files, validation_files):
-    f = open('ground-truth/transcription.txt', 'r')
+    f = open('Exercise_4/Exercise_4/ground-truth/transcription.txt', 'r')
     Lines = f.readlines()
     train_transcription = []
     validation_transcription = []
@@ -261,7 +262,7 @@ def transfrom_rank_into_word(ranked_dtw_distances, train_transcription):
     return train_word_ranks
 
 def read_keywords():
-    f = open('task/keywords.txt', 'r')
+    f = open('Exercise_4/Exercise_4/task/keywords.txt', 'r')
     Lines = f.readlines()
 
     for i, line in enumerate(Lines):
