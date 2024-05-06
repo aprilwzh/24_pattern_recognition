@@ -178,12 +178,28 @@ def feature_matrices(binarized_word_images, window_width, offset):
 ###
 # Get Feature Matrices for Train and Validation Sets
 
-def get_feature_matrices(files, window_width=1, offset=1):
+def get_feature_matrices(files, window_width=1, offset=1, specific_imgs=None):
     features = []
     indices = []
 
-    for file in files:
+    for i, file in enumerate(files):
         words, idx = read_svg_file(file)
+        if specific_imgs is not None:
+            tmp_idx = []
+            tmp_words = []
+            old_idx = -1
+            for img in specific_imgs:
+                for i, ind in enumerate(idx):
+                    if ind == img:
+                        new_idx = i
+                        break
+
+                if old_idx != new_idx and idx[new_idx] == img:
+                    tmp_idx.append(idx[new_idx])
+                    tmp_words.append(words[new_idx])
+                    old_idx = new_idx
+            words, idx = tmp_words, tmp_idx
+
         polygons, images = get_sub_images_from_polygons(file, words)
         binarized_word_images = binarize_images(images)
         features.append(feature_matrices(binarized_word_images, window_width, offset))
@@ -287,35 +303,3 @@ def get_file_indices(file_name):
     files = pandas.read_csv(file_name, sep='\t', header=None)
     return files[0].apply(int)
 
-
-# In[ ]:
-
-train_files = get_file_indices('KWS/train.tsv')
-val_files = get_file_indices('KWS/validation.tsv')
-
-window_width = 1
-offset = 1
-
-train_set, train_file_indices = get_feature_matrices(train_files, window_width=window_width, offset=offset)
-val_set, val_file_indices = get_feature_matrices(val_files, window_width=window_width, offset=offset)
-
-print(len(train_set), len(val_set))
-dtw_distance = find_dtw(train_set, val_set)
-sorted_dtw_distances = np.argsort(dtw_distance, axis=1)
-print('finished part 1')
-
-# np.savetxt('distances.txt', sorted_dtw_distances)
-#
-# sorted_dtw_distances = np.loadtxt('distances.txt')
-# # In[ ]:
-# print(sorted_dtw_distances[0])
-
-train_words, val_words = read_words(train_files)
-sorted_train_words = convert_rank_to_word(sorted_dtw_distances, train_words)
-keywords = read_keywords()
-
-precision_top_1 = np.arange(1, len(train_words))
-precision, recall = precision_and_recall(precision_top_1, keywords, sorted_train_words, val_words)
-print(precision, recall)
-
-plot_pres_recall(precision, recall)
