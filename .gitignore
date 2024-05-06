@@ -1,3 +1,8 @@
+.DS_Store
+../.DS_Store
+.idea/
+__pycache__/
+
 group_exercise1/homework3.py
 group_exercise1/.idea/
 group_exercise1/data/
@@ -9,3 +14,6 @@ group_exercise1/.DS_Store
 group_exercise1/__pycache__/
 
 group_exercise2/KWS/
+group_exercise2/KWS-test/
+group_exercise2/main.py
+group_exercise2/*.txt
