@@ -1,62 +1,17 @@
-import xml.etree.ElementTree as ET
-import networkx as nx
-import matplotlib.pyplot as plt
-import re
-
-def parse_gxl_to_networkx(gxl_str):
-    # Parse the XML string into an ElementTree object
-    root = ET.fromstring(gxl_str).findall('graph')[0]
-    # print(root.findall('graph')[0].findall('node'))
-
-    # Initialize a NetworkX graph
-    graph = nx.Graph()
-    node_symbols = {}
-
-    # Iterate over nodes to extract symbols and add them as nodes to the graph
-    for node in root.findall('node'):
-        node_id = node.attrib['id']
-        symbol = None
-        # Extract the symbol from node attributes
-        for attr in node.findall('attr'):
-            if attr.attrib['name'] == 'symbol':
-                symbol = attr.find('string').text.strip()
-                break
-        if symbol:
-            graph.add_node(node_id, symbol=symbol)
-            node_symbols[node_id] = symbol
-
-    # Iterate over edges to add them to the graph
-    for edge in root.findall('edge'):
-        source = edge.attrib['from']
-        target = edge.attrib['to']
-        graph.add_edge(source, target)
-
-    return graph, node_symbols
-
-file_name = 'Molecules/gxl/40.gxl'
-with open(file_name, 'r') as file:
-    lines = file.readlines()
-    gxl_str = "".join(line for line in lines if not line.startswith("<?xml"))
+from utils import *
 
 
-pattern = r'<gxl>(.*?)</gxl>'
+file_name = 'Molecules/gxl/35.gxl'
+try:
+    gxl_str = get_xml_string(file_name=file_name)
+except AssertionError:
+    print('Assertion Failed! Incorrect gxl format!!!')
+    exit(0)
 
-matches = re.findall(pattern, gxl_str)
-if matches:
-    gxl_str = '<gxl>'+matches[0]+'</gxl>'
-    # print('<gxl>'+matches[0]+'</gxl>')
-else:
-    print('ggrrrrr')
+graph = parse_gxl_to_networkx(gxl_str)
 
-print('graph_string:', gxl_str)
-
-graph, node_symbols = parse_gxl_to_networkx(gxl_str)
-print("Nodes:", graph.nodes(data=True))
-print("Edges:", graph.edges())
-
-fig = plt.figure()
-nx.draw(graph, labels=node_symbols, with_labels=True)
-plt.show()
+print_graph_data(graph)
+draw_graph(graph)
 
 # generator = nx.optimize_graph_edit_distance(g2, g3)
 
