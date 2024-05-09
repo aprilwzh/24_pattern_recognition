@@ -6,6 +6,11 @@ import numpy as np
 
 
 def parse_gxl_to_networkx(gxl_str):
+    try:
+        gxl_str = get_xml_string(file_name=gxl_str)
+    except AssertionError:
+        print('Assertion Failed! Incorrect gxl format!!!')
+        exit(0)
     # Parse the XML string into an ElementTree object
     root = ET.fromstring(gxl_str).findall('graph')[0]
     # print(root.findall('graph')[0].findall('node'))
@@ -66,7 +71,7 @@ def print_graph_data(g):
     print("Edges:", g.edges(data=True))
 
 
-def draw_graph(g):
+def draw_graph(g, i=None):
     pos = nx.get_node_attributes(g, 'pos')
 
     fig = plt.figure()
@@ -74,4 +79,7 @@ def draw_graph(g):
     labels = nx.get_edge_attributes(g, 'weight')
     nx.draw_networkx_edge_labels(g, pos, edge_labels=labels)
 
+    if i is not None:
+        plt.suptitle(f'file_number: {i}')
+        print(f'file_number: {i}')
     plt.show()
