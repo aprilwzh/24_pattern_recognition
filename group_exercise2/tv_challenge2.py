@@ -4,7 +4,6 @@ from utils import *
 import os
 import csv
 
-
 keywords_locations = pandas.read_csv('KWS-test/keywords.tsv', sep='\t', header=None)
 
 keywords = keywords_locations[0].values
@@ -47,33 +46,35 @@ test_files = get_file_indices('KWS-test/test.tsv')
 test_set, test_file_indices = get_feature_matrices(test_files, window_width=window_width, offset=offset,
                                                    folder_name='KWS-test/')
 
-print(test_file_indices)
+# print(test_file_indices)
 
 print(len(combined_set), len(test_set))
 dtw_distance = find_dtw(test_set, combined_set)
-sorted_dtw_distances = np.argsort(dtw_distance, axis=1)
+sorted_dtw_distances = np.sort(dtw_distance, axis=1)
 np.savetxt('distances2.txt', sorted_dtw_distances)
 print('finished part 1')
 
+sorted_idxs = np.argsort(dtw_distance, axis=1)
+sorted_dtw_distances = dtw_distance[np.arange(len(dtw_distance))[:, None], sorted_idxs]
+test_file_indices = np.array(test_file_indices)
+sorted_test_indices = test_file_indices[sorted_idxs]
 
-def save_results_to_tsv(sorted_dtw_distances, keywords, output_path='group_exercise2/Challenge.tsv'):
+
+def save_results_to_tsv(sorted_dtw_distances, keywords, sorted_test_indices, output_path='help.tsv'):
     with open(output_path, 'w') as f:
-        for i, keyword in enumerate(keywords):
-            f.write(keyword)
+        for i in range(len(keywords)):
+            keyword = keywords[i]
             distances = sorted_dtw_distances[i]
-            # Sorting the dissimilarities
-            sorted_distances_indices = np.argsort(distances)[::-1]
-            for index in sorted_distances_indices:
-                f.write(f'\t{index}\t{distances[index]}')  # Write id + distance
-            f.write('\n')
+            indices = sorted_test_indices[i]
+            f.write(f'{keyword} ')
+            for j in range(len(distances)):
+                index = indices[j]
+                distance = distances[j]
+                f.write(f'{index}\t{distance} ')
+            f.write(f'\n')
 
-
-# Loading the distances from distances.txt
 sorted_dtw_distances = np.loadtxt('distances2.txt')
 
-# save the results
-save_results_to_tsv(sorted_dtw_distances, keywords, output_path='help.tsv')
-
-
+save_results_to_tsv(sorted_dtw_distances, keywords, sorted_test_indices, output_path='help.tsv')
 
 print('created the file')
