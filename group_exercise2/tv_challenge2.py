@@ -1,9 +1,11 @@
+import numpy as np
+
 from utils import *
 import os
 import csv
 
 
-keywords_locations = pandas.read_csv('group_exercise2/KWS-test/keywords.tsv', sep='\t', header=None)
+keywords_locations = pandas.read_csv('KWS-test/keywords.tsv', sep='\t', header=None)
 
 keywords = keywords_locations[0].values
 locations = keywords_locations[1].values
@@ -38,14 +40,19 @@ val_set, val_file_indices = get_feature_matrices(val_files, window_width=1, offs
 
 combined_set = train_set + val_set
 combined_file_indices = train_file_indices + val_file_indices
+print(len(combined_set))
 
-test_files = get_file_indices('group_exercise2/KWS-test/test.tsv')
+test_files = get_file_indices('KWS-test/test.tsv')
 
-test_set, test_file_indices = get_feature_matrices(train_files, window_width=window_width, offset=offset)
+test_set, test_file_indices = get_feature_matrices(test_files, window_width=window_width, offset=offset,
+                                                   folder_name='KWS-test/')
+
+print(test_file_indices)
 
 print(len(combined_set), len(test_set))
-dtw_distance = find_dtw(combined_set, test_set)
+dtw_distance = find_dtw(test_set, combined_set)
 sorted_dtw_distances = np.argsort(dtw_distance, axis=1)
+np.savetxt('distances2.txt', sorted_dtw_distances)
 print('finished part 1')
 
 
@@ -60,11 +67,12 @@ def save_results_to_tsv(sorted_dtw_distances, keywords, output_path='group_exerc
                 f.write(f'\t{index}\t{distances[index]}')  # Write id + distance
             f.write('\n')
 
+
 # Loading the distances from distances.txt
-sorted_dtw_distances = np.loadtxt('distances.txt')
+sorted_dtw_distances = np.loadtxt('distances2.txt')
 
 # save the results
-save_results_to_tsv(sorted_dtw_distances, keywords)
+save_results_to_tsv(sorted_dtw_distances, keywords, output_path='help.tsv')
 
 
 
