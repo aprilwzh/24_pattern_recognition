@@ -50,8 +50,8 @@ def get_bounding_box(svgpath):
     return int(x_min), int(y_min), int(x_max), int(y_max)
 
 
-def read_svg_file(file_number):
-    with open(f'KWS/locations/{file_number}.svg', 'r') as file:
+def read_svg_file(file_number, folder_name):
+    with open(f'{folder_name}locations/{file_number}.svg', 'r') as file:
         svg_data = file.read()
     root = ET.fromstring(svg_data)
     polygons = []
@@ -63,8 +63,8 @@ def read_svg_file(file_number):
     return polygons, indices
 
 
-def get_sub_images_from_polygons(file_number, polygons):
-    img = cv2.imread(f'KWS/images/{file_number}.jpg')
+def get_sub_images_from_polygons(file_number, polygons, folder_name):
+    img = cv2.imread(f'{folder_name}images/{file_number}.jpg')
 
     word_boxes = []
     word_images = []
@@ -178,12 +178,12 @@ def feature_matrices(binarized_word_images, window_width, offset):
 ###
 # Get Feature Matrices for Train and Validation Sets
 
-def get_feature_matrices(files, window_width=1, offset=1, specific_imgs=None):
+def get_feature_matrices(files, window_width=1, offset=1, specific_imgs=None, folder_name='KWS/'):
     features = []
     indices = []
 
     for i, file in enumerate(files):
-        words, idx = read_svg_file(file)
+        words, idx = read_svg_file(file, folder_name)
         if specific_imgs is not None:
             tmp_idx = []
             tmp_words = []
@@ -200,7 +200,7 @@ def get_feature_matrices(files, window_width=1, offset=1, specific_imgs=None):
                     old_idx = new_idx
             words, idx = tmp_words, tmp_idx
 
-        polygons, images = get_sub_images_from_polygons(file, words)
+        polygons, images = get_sub_images_from_polygons(file, words, folder_name)
         binarized_word_images = binarize_images(images)
         features.append(feature_matrices(binarized_word_images, window_width, offset))
         indices.append(idx)
@@ -216,13 +216,13 @@ def find_dtw(train_set, val_set):
     dtw_mat = np.zeros((n_val, n_train))
     for i in range(n_val):
         for j in range(n_train):
-            dtw_mat[i, j] = dtw(val_set[i], train_set[i], global_constraint="sakoe_chiba")
+            dtw_mat[i, j] = dtw(val_set[i], train_set[j], global_constraint="sakoe_chiba")
 
     return dtw_mat
 
 
 def read_words(train_indices):
-    file_dataframe = pandas.read_csv('KWS/transcription.tsv', sep='\t', header=None)
+    file_dataframe = pandas.read_csv('KWS-test/transcription.tsv', sep='\t', header=None)
 
     train_words = []
     val_words = []
