@@ -60,7 +60,7 @@ test_file_indices = np.array(test_file_indices)
 sorted_test_indices = test_file_indices[sorted_idxs]
 
 
-def save_results_to_tsv(sorted_dtw_distances, keywords, sorted_test_indices, output_path='help.tsv'):
+def save_results_to_tsv(sorted_dtw_distances, keywords, sorted_test_indices, output_path='test.tsv'):
     with open(output_path, 'w') as f:
         for i in range(len(keywords)):
             keyword = keywords[i]
@@ -75,6 +75,6 @@ def save_results_to_tsv(sorted_dtw_distances, keywords, sorted_test_indices, out
 
 sorted_dtw_distances = np.loadtxt('distances2.txt')
 
-save_results_to_tsv(sorted_dtw_distances, keywords, sorted_test_indices, output_path='help.tsv')
+save_results_to_tsv(sorted_dtw_distances, keywords, sorted_test_indices, output_path='test.tsv')
 
 print('created the file')
