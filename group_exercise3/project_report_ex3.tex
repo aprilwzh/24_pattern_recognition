@@ -1,0 +1,36 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+\usepackage{float}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Pattern Recognition \\\Large{Molecular Exercise}}
+\author{Tobias Verheijen, Mattéo Bonvin, Zhihui Wang}
+\date{20 May, 2024}
+
+\begin{document}
+\maketitle
+
+\section{Molecular Exercise}
+
+For this exercise, we chose to complete the Molecular/graph-based problem. 
+We used a relatively straight forward set of cost functions: node insersion/deletion = 1, node substitution = 2 if not equal, 0 otherwise, edge insersion/delection = 1, edge substitution = |difference in valence|.
+
+We then used the GED as the basis for our KNN classifier.
+
+With a base-line of $k=3$, we achieve an accuracy of \textbf{0.972}. With $k=5$, we achieve an accuracy of \textbf{0.956}.
+
+\section{Competition}
+
+
+\end{document}
