@@ -1,0 +1,20 @@
+import matplotlib.pyplot as plt
+
+# 数据
+k_values = [1, 3, 5, 7, 9]
+accuracy_values = [243, 243, 239, 235, 231]
+
+# 创建图形
+plt.figure(figsize=(10, 6))
+
+# 绘制折线图
+plt.plot(k_values, accuracy_values, marker='o', linestyle='-', color='b')
+
+# 添加标题和标签
+plt.title('Accuracy vs K values')
+plt.xlabel('K values')
+plt.ylabel('Accuracy')
+
+# 显示图形
+plt.grid(True)
+plt.show()
